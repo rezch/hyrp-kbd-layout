@@ -5,6 +5,7 @@ import (
 	"github.com/labi-le/hyprland-ipc-client/v3"
 	"log"
 	"os"
+	"strings"
 )
 
 type Output struct {
@@ -40,6 +41,18 @@ func ReadFirstLayout(ipc client.IPC, evDispatcher client.EventHandler) {
 	}
 }
 
+func ShortLayoutName(layoutName string) string {
+	layouts := map[string]string {
+		"English (US)": "en",
+		"Russian": "ru",
+	}
+	if val, ok := layouts[layoutName]; ok {
+		return val
+	}
+	max_length := min(2, len(layoutName))
+	return strings.ToLower(layoutName[:max_length])
+}
+
 func main() {
 	var (
 		ipc          = client.MustClient(os.Getenv("HYPRLAND_INSTANCE_SIGNATURE"))
@@ -55,7 +68,7 @@ func main() {
 
 func (e *ed) ActiveLayout(layout client.ActiveLayout) {
 	ToStdOut(Output{
-		Text:    layout.Name,
+		Text:    ShortLayoutName(layout.Name),
 		Tooltip: "Current keyboard layout",
 		Class:   "keyboard-layout",
 	})
